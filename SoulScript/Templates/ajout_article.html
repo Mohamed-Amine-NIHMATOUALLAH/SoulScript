@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ajouter un Article</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #000;
+        color: #fff;
+      }
+      .navbar,
+      .card,
+      .btn {
+        background-color: #111;
+        color: #fff;
+      }
+      .btn:hover {
+        background-color: #333;
+      }
+      input,
+      select,
+      textarea {
+        background-color: #222 !important;
+        color: #fff !important;
+        border: 1px solid #555 !important;
+      }
+      .form-control::placeholder {
+        color: #aaa !important;
+      }
+      a {
+        color: #0dcaf0;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        {% load static %}
+        <a class="navbar-brand" href="#"></a>
+        <img src="{% static 'logo.png'%}">
+        <div>
+          <a class="text-white me-3" href="#">Accueil</a>
+          <a class="text-white me-3" href="#">Articles</a>
+          <select class="form-select d-inline-block w-auto bg-dark text-white">
+            <option>Rechercher par catégorie</option>
+            <option value="Certificat">Certificat</option>
+            <option value="Diplôme">Diplôme</option>
+            <option value="CV">CV</option>
+            <option value="Lettre de motivation">Lettre de motivation</option>
+            <option value="Stage">Stage</option>
+            <option value="Accréditation professionnelle">
+              Accréditation professionnelle
+            </option>
+          </select>
+        </div>
+        <div>
+          <a href="{% url 'profil'%}" class="btn btn-outline-light me-2">👤</a>
+          <button class="btn btn-danger">Déconnexion</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-5">
+      <div class="card p-4">
+        <h2 class="mb-4">Ajouter un Article</h2>
+        <form>
+          <div class="mb-3">
+            <label for="Nom_article">Nom de l'article :</label>
+            <input
+              type="text"
+              class="form-control"
+              id="Nom_article"
+              placeholder="Nom de l'article"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="Création">Date de Création :</label>
+            <input type="date" id="Création" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label for="fin">Date de fin :</label>
+            <input
+              type="date"
+              id="fin"
+              class="form-control"
+              placeholder="Date de fin d'utilisation"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="categorie">Catégorie :</label>
+            <select id="categorie" class="form-select" required>
+              <option value="">Sélectionner une catégorie</option>
+              <option value="Certificat">Certificat</option>
+              <option value="Diplôme">Diplôme</option>
+              <option value="CV">CV</option>
+              <option value="Lettre de motivation">Lettre de motivation</option>
+              <option value="Stage">Stage</option>
+              <option value="Accréditation professionnelle">
+                Accréditation professionnelle
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="Description">Description :</label>
+            <textarea
+              class="form-control"
+              id="Description"
+              placeholder="Description (max 500 caractères)"
+              maxlength="500"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ajouter des photos</label>
+            <input type="file" class="form-control" multiple />
+          </div>
+          <button type="submit" class="btn btn-light w-100">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

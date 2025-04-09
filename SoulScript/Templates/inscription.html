@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription</title>
+    {% csrf_token %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-dark: #0a0a0a;
+        --secondary-dark: #1a1a1a;
+        --tertiary-dark: #2a2a2a;
+        --primary-light: #ffffff;
+        --secondary-light: #f0f0f0;
+        --tertiary-light: #dddddd;
+
+      
+        --blue-light: #4da6ff;
+        --blue-medium: #0066cc;
+        --blue-dark: #004080;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--primary-dark),
+          var(--secondary-dark)
+        );
+        color: var(--primary-light);
+        font-family: "Segoe UI", Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        background: linear-gradient(
+          to bottom,
+          var(--secondary-dark),
+          var(--tertiary-dark)
+        );
+        padding: 35px;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5),
+          0 4px 10px rgba(255, 255, 255, 0.1);
+        width: 800px;
+        text-align: center;
+      }
+
+      h2 {
+        margin-bottom: 25px;
+        color: var(--primary-light);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        position: relative;
+        padding-bottom: 10px;
+      }
+
+      h2:after {
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(
+          to right,
+          var(--blue-light),
+          var(--blue-dark)
+        );
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .form-group {
+        text-align: left;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+        color: var(--secondary-light);
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        background: var(--tertiary-dark);
+        color: var(--primary-light);
+        transition: all 0.3s ease;
+        /* Bordure avec dégradé bleu */
+        border: none;
+        box-shadow: 0 0 0 1px var(--blue-dark);
+        position: relative;
+      }
+
+      /* Bordures avec dégradés bleus différents pour chaque champ */
+      #username {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to right, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #prenom {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to left, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #nom {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to bottom, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #cne {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(45deg, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #telephone {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(135deg, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #date_naissance {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(
+            90deg,
+            var(--blue-dark),
+            var(--blue-light),
+            var(--blue-dark)
+          );
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #email {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to top, var(--blue-light), var(--blue-dark));
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      #password,
+      #confirm_password {
+        box-shadow: 0 0 0 1px var(--tertiary-dark), 0 0 0 2px transparent;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(
+            to right,
+            var(--blue-dark),
+            var(--blue-medium),
+            var(--blue-light)
+          );
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      input:focus {
+        outline: none;
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to right, var(--blue-light), #00c6ff);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 0 10px rgba(77, 166, 255, 0.3);
+      }
+
+      .form-check {
+        padding-left: 30px;
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .form-check-input {
+        position: absolute;
+        left: 0;
+        top: 4px;
+        margin: 0;
+        width: 18px;
+        height: 18px;
+      }
+
+      .form-check-label {
+        color: var(--tertiary-light);
+        font-size: 0.9rem;
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(
+          to right,
+          var(--blue-medium),
+          var(--blue-light)
+        );
+        color: var(--primary-light);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        background: linear-gradient(
+          to right,
+          var(--blue-light),
+          var(--blue-medium)
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 102, 204, 0.4);
+      }
+
+      button:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Animation d'apparition du formulaire */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .container {
+        animation: fadeIn 0.8s ease forwards;
+      }
+
+      /* Style pour la validation */
+      input:invalid {
+        background-image: linear-gradient(
+            var(--tertiary-dark),
+            var(--tertiary-dark)
+          ),
+          linear-gradient(to right, #ff5252, #ff9966);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+      }
+
+      /* Style responsive */
+      @media (max-width: 500px) {
+        .container {
+          padding: 25px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Inscription</h2>
+      <form id="inscriptionForm" action="{% url 'inscription' %}" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" name="prenom" required />
+        </div>
+        <div class="form-group">
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" name="nom" required />
+        </div>
+        <div class="form-group">
+          <label for="cne">CNE</label>
+          <input
+            type="text"
+            id="cne"
+            name="cne"
+            pattern="[A-Za-z0-9]+"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="telephone">Numéro de téléphone</label>
+          <input
+            type="tel"
+            id="telephone"
+            name="telephone"
+            pattern="[0-9]+"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="date_naissance">Date de naissance</label>
+          <input
+            type="date"
+            id="date_naissance"
+            name="date_naissance"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            minlength="8"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirmer le mot de passe</label>
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            required
+          />
+        </div>
+        <br />
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="verification"
+            required
+          />
+          <label class="form-check-label" for="verification">
+            J'accepte la vérification de mes données personnelles </label><br /><br />
+        </div>
+        <button type="submit">S'inscrire</button>
+      </form>
+    </div>
+
+    <script>
+      // Vérification de la correspondance des mots de passe
+      document
+        .getElementById("inscriptionForm")
+        .addEventListener("submit", function (event) {
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirm_password").value;
+
+          if (password !== confirmPassword) {
+            event.preventDefault();
+            alert("Les mots de passe ne correspondent pas.");
+          }
+        });
+    </script>
+  </body>
+</html>
