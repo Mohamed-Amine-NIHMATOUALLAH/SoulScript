@@ -20,5 +20,6 @@ from django.urls import path,include # type: ignore
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('bloc_per/',include('Bloc_Per.urls'))
+    path('bloc_per/',include('Bloc_Per.urls')),
+    path('Home/',include('Home.urls')),
 ]

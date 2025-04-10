@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="logo.png" /></a>
+        <div>
+          <a class="text-white me-3" href="#">Accueil</a>
+          <a class="text-white me-3" href="#">Articles</a>
+          <select class="form-select d-inline-block w-auto bg-dark text-white">
+            <option>Rechercher par catégorie</option>
+            <option value="Certificat">Certificat</option>
+            <option value="Diplôme">Diplôme</option>
+            <option value="CV">CV</option>
+            <option value="Lettre de motivation">Lettre de motivation</option>
+            <option value="Stage">Stage</option>
+            <option value="Accréditation professionnelle">
+              Accréditation professionnelle
+            </option>
+          </select>
+        </div>
+        <div>
+          <a href="{% url 'profil'%}" class="btn btn-outline-light me-2">👤</a>
+          <button class="btn btn-danger">Déconnexion</button>
+        </div>
+      </div>
+    </nav>
+    {% else %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3"></nav>
+    <div>
+      <a class="text-white me-3" href="#">Accueil</a>
+      <select class="form-select d-inline-block w-auto bg-dark text-white">
+        <option>Rechercher par catégorie</option>
+        <option value="Certificat">Certificat</option>
+        <option value="Diplôme">Diplôme</option>
+        <option value="CV">CV</option>
+        <option value="Lettre de motivation">Lettre de motivation</option>
+        <option value="Stage">Stage</option>
+        <option value="Accréditation professionnelle">
+          Accréditation professionnelle
+        </option>
+      </select>
+      <div>
+        <a href="{% url 'Bloc_Per:login' %}" class="btn btn-danger"
+          >Connexion</a
+        >
+      </div>
+    </div>
+    {% endif %}
+  </body>
+</html>

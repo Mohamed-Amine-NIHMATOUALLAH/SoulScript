@@ -49,32 +49,17 @@
         <table>
             <thead>
                 <tr>
-                    <th>Nom</th>
-                    <th>Date de Création</th>
-                    <th>Catégorie</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="articlesTable">
-                <tr>
-                    <td>Article 1</td>
-                    <td>2025-03-20</td>
-                    <td>Technologie</td>
-                    <td>
+                    <th>{{images.image}}</th>
+                    <th>Nom : {{ articles.nom }}</th>
+                    <th>Date de Création : {{ articles.creation_date }}</th>
+                    <th>Catégorie : {{ articles.categorie }}</th>
+                    <th>discription : {{ articles.description }}</th>
+                    <th>
                         <button href="{% url 'ajout_article'%}" class="btn edit">Modifier</button>
                         <button class="btn delete">Supprimer</button>
-                    </td>
+                    </th>
                 </tr>
-                <tr>
-                    <td>Article 2</td>
-                    <td>2025-03-21</td>
-                    <td>Science</td>
-                    <td>
-                        <button class="btn edit">Modifier</button>
-                        <button class="btn delete">Supprimer</button>
-                    </td>
-                </tr>
-            </tbody>
+            </thead>
         </table><br><br>
         <a href="{% url 'ajout_article' %}" class="ajout-article">Ajouter un article</a>
     </div>

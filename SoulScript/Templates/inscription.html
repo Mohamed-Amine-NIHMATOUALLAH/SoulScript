@@ -307,9 +307,8 @@
   <body>
     <div class="container">
       <h2>Inscription</h2>
-      <form id="inscriptionForm" action="{% url 'inscription' %}" method="POST">
+      <form id="inscriptionForm" action="{% url 'Bloc_Per:inscription' %}" method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
         <div class="form-group">
           <label for="username">Nom d'utilisateur</label>
           <input type="text" id="username" name="username" required />
