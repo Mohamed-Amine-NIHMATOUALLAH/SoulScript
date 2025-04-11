@@ -38,7 +38,7 @@
                   </select>
             </div>
             <div>
-                <a href="{% url 'profil'%}" class="btn btn-outline-light me-2">👤</a>
+                <a href="#" class="btn btn-outline-light me-2">👤</a>
                 <button class="btn btn-danger">Déconnexion</button>
             </div>
         </div>
@@ -55,13 +55,13 @@
                     <th>Catégorie : {{ articles.categorie }}</th>
                     <th>discription : {{ articles.description }}</th>
                     <th>
-                        <button href="{% url 'ajout_article'%}" class="btn edit">Modifier</button>
+                        <button href="#" class="btn edit">Modifier</button>
                         <button class="btn delete">Supprimer</button>
                     </th>
                 </tr>
             </thead>
         </table><br><br>
-        <a href="{% url 'ajout_article' %}" class="ajout-article">Ajouter un article</a>
+        <a href="/bloc_per/ajout_article/{{user.username}}/" class="ajout-article">Ajouter un article</a>
     </div>
 
     <script>

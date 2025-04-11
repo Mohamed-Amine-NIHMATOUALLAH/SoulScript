@@ -1,3 +1,4 @@
+{% csrf_token %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,7 +13,7 @@
         <a class="navbar-brand" href="#"><img src="logo.png" /></a>
         <div>
           <a class="text-white me-3" href="#">Accueil</a>
-          <a class="text-white me-3" href="#">Articles</a>
+          <a class="text-white me-3" href="/bloc_per/articles_personnels/{{user.username}}/">Articles</a>
           <select class="form-select d-inline-block w-auto bg-dark text-white">
             <option>Rechercher par catégorie</option>
             <option value="Certificat">Certificat</option>
@@ -26,7 +27,7 @@
           </select>
         </div>
         <div>
-          <a href="{% url 'profil'%}" class="btn btn-outline-light me-2">👤</a>
+          <a href="#" class="btn btn-outline-light me-2">👤</a>
           <button class="btn btn-danger">Déconnexion</button>
         </div>
       </div>

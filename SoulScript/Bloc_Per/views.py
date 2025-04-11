@@ -1,13 +1,18 @@
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy  
+from django.urls import reverse, reverse_lazy  
 from datetime import date
 from Bloc_Per.models import Utilisateur, Article, Image  
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.views import LoginView
 from django.views.generic import CreateView
 from .forms import ArticleForm
 from datetime import date
+from django.contrib.auth import authenticate, login as auth_login
+
 app_name = 'Bloc_Per'
 
 class inscription(CreateView):
@@ -45,7 +50,8 @@ class inscription(CreateView):
         
         form.instance.password = make_password(form.cleaned_data.get('password') or '')
         return super().form_valid(form)
-
+    
+@csrf_exempt
 def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -53,10 +59,10 @@ def login(request):
         try:
             user = Utilisateur.objects.get(email=email)
 
-            # Vérifie si le mot de passe est bien haché et valide
+            # Vérifie si le mot de passe est valide
             if user.password and check_password(password, user.password):
-                # Tu peux stocker l'ID dans la session par exemple
-                request.session['user_id'] = user.id
+                # Authentifie l'utilisateur dans le système de Django
+                auth_login(request, user)
                 return render(request, 'Home.html', {'username': user.username})
             else:
                 return render(request, 'login.html', {'error': 'Mot de passe incorrect'})
@@ -66,59 +72,39 @@ def login(request):
     return render(request, 'login.html')
 
 
-def ajout_article(request,username):
+
+def ajout_article(request, username):
+    user = Utilisateur.objects.get(username=username)  # Récupérer l'utilisateur
     if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('liste_articles')  # à adapter selon ton URL
-    else:
-        form = ArticleForm()
-    return render(request, 'ajout_article.html', {'form': form})
+        # Récupérer les données du formulaire personnalisé
+        nom = request.POST.get('nom')
+        categorie = request.POST.get('Catégorie')
+        creation_date = request.POST.get('Création_date')
+        description = request.POST.get('Description')
+        images = request.FILES.getlist('images')  # Récupérer les fichiers
+
+        # Créer un nouvel article
+        article = Article.objects.create(
+            username=user,
+            nom=nom,
+            Catégorie=categorie,
+            Création_date=creation_date,
+            Description=description,
+        )
+
+        # Enregistrer les images associées à l'article
+        for image in images:
+            Image.objects.create(article=article, image=image)
+
+        # Rediriger après l'ajout
+        return redirect('Bloc_Per:articles_personnels', username=username)
+
+    return render(request, 'ajout_article.html', {'user': user})
 
 
-def articles_personnels(request,username):
-    Article=Article.objects.filter(username=username)
-    images=Image.image_set.all()
-    return render(request,'articles_personnels.html', {'articles': Article, 'images': images})
+def articles_personnels(request, username):
+    user=Utilisateur.objects.get(username=username)
+    articles = Article.objects.filter(username__username=username)  # Correction ici
+    images = Image.objects.all()  # Correction pour accéder aux images
+    return render(request, 'articles_personnels.html', {'articles': articles, 'images': images , 'user':user})
 
-
-def profil(request, username):
-    
-    user = Utilisateur.objects.get(username=username)
-    error = None
-    success = None
-
-    if request.method == 'POST':
-        action = request.POST.get('action')
-
-        if action == 'update_info':
-            # Mettre à jour les informations personnelles
-            cne = request.POST.get('cne', user.cne)  # Utiliser la valeur actuelle si non fournie
-            nom = request.POST.get('nom', user.nom)
-            prenom = request.POST.get('prenom', user.prenom)
-            new_username = request.POST.get('username', user.username)
-            email = request.POST.get('email', user.email)
-            telephone = request.POST.get('telephone', user.telephone)
-
-            # Vérifier les conflits avec d'autres utilisateurs
-            if email != user.email and (Utilisateur.objects.filter(email=email).exists() or Fournisseur.objects.filter(email=email).exists()):
-                error = "L'email existe déjà."
-            elif telephone != user.telephone and (Utilisateur.objects.filter(phone_number=phone_number).exists() or Fournisseur.objects.filter(phone_number=phone_number).exists()):
-                error = "Le numéro de téléphone existe déjà."
-            elif new_username != user.username and (Utilisateur.objects.filter(username=new_username).exists() or Fournisseur.objects.filter(username=new_username).exists()):
-                error = "Le nom d'utilisateur existe déjà."
-            else:
-                # Mettre à jour les informations personnelles
-                user.cne = cne
-                user.nom = nom
-                user.prenom = prenom
-                user.username = new_username
-                user.email = email
-                user.telephone =telephone
-                user.save()
-                success = "Informations mises à jour avec succès."
-
-        
-
-    return render(request, 'profil.html', {'user': user, 'error': error, 'success': success})

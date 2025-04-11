@@ -65,7 +65,7 @@
           </select>
         </div>
         <div>
-          <a href="{% url 'profil'%}" class="btn btn-outline-light me-2">👤</a>
+          <a href="#" class="btn btn-outline-light me-2">👤</a>
           <button class="btn btn-danger">Déconnexion</button>
         </div>
       </div>
@@ -74,33 +74,37 @@
     <div class="container mt-5">
       <div class="card p-4">
         <h2 class="mb-4">Ajouter un Article</h2>
-        <form>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
           <div class="mb-3">
-            <label for="Nom_article">Nom de l'article :</label>
+            <label for="nom">Nom de l'article :</label>
             <input
               type="text"
               class="form-control"
-              id="Nom_article"
+              id="nom"
+              name="nom"  <!-- Correspond au champ "nom" du modèle -->
               placeholder="Nom de l'article"
               required
             />
           </div>
           <div class="mb-3">
-            <label for="Création">Date de Création :</label>
-            <input type="date" id="Création" class="form-control" required />
-          </div>
-          <div class="mb-3">
-            <label for="fin">Date de fin :</label>
+            <label for="Création_date">Date de Création :</label>
             <input
               type="date"
-              id="fin"
+              id="Création_date"
+              name="Création_date"  <!-- Correspond au champ "Création_date" du modèle -->
               class="form-control"
-              placeholder="Date de fin d'utilisation"
+              required
             />
           </div>
           <div class="mb-3">
-            <label for="categorie">Catégorie :</label>
-            <select id="categorie" class="form-select" required>
+            <label for="Catégorie">Catégorie :</label>
+            <select
+              id="Catégorie"
+              name="Catégorie"  <!-- Correspond au champ "Catégorie" du modèle -->
+              class="form-select"
+              required
+            >
               <option value="">Sélectionner une catégorie</option>
               <option value="Certificat">Certificat</option>
               <option value="Diplôme">Diplôme</option>
@@ -117,6 +121,7 @@
             <textarea
               class="form-control"
               id="Description"
+              name="Description"  <!-- Correspond au champ "Description" du modèle -->
               placeholder="Description (max 500 caractères)"
               maxlength="500"
               required
@@ -124,7 +129,12 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Ajouter des photos</label>
-            <input type="file" class="form-control" multiple />
+            <input
+              type="file"
+              class="form-control"
+              name="images"  <!-- Correspond au champ pour les fichiers -->
+              multiple
+            />
           </div>
           <button type="submit" class="btn btn-light w-100">Ajouter</button>
         </form>
