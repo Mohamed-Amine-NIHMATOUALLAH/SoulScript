@@ -72,7 +72,6 @@ def login(request):
     return render(request, 'login.html')
 
 
-
 def ajout_article(request, username):
     user = Utilisateur.objects.get(username=username)  # Récupérer l'utilisateur
     if request.method == 'POST':
