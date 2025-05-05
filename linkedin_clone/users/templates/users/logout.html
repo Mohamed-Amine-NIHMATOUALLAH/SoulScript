@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% load static %} {% block title %}Déconnexion{%
+endblock %} {% block content %}<br /><br />
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card auth-card">
+        <div class="card-header text-center">
+          <h2>Déconnexion</h2>
+        </div>
+        <div class="card-body text-center">
+          <h3>Vous avez été déconnecté avec succès</h3>
+          <div class="border-top pt-3">
+            <a href="{% url 'login' %}" class="btn btn-outline-primary"
+              >Se reconnecter</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
