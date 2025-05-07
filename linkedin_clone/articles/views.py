@@ -17,9 +17,11 @@ class ArticleListView(ListView):
     paginate_by = 10
     
     def get_template_names(self):
-        if not self.request.user.is_authenticated:
+        # Vérifier si l'utilisateur est authentifié
+        if self.request.user.is_authenticated:
+            return [self.template_name]
+        else:
             return ['articles/welcome.html']
-        return [self.template_name]
     
     def get_queryset(self):
         queryset = Article.objects.filter(is_draft=False)

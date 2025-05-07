@@ -9,9 +9,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', user_views.register, name='register'),
     path('profile/', user_views.profile, name='profile'),
-    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
-    # Modifier cette ligne pour accepter les requêtes GET
-    path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html', next_page='home'), name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html', next_page='profile'), name='login'),
+    # Supprimez cette ligne ou commentez-la
+    # path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html', next_page='home'), name='logout'),
     path('password-reset/', 
          auth_views.PasswordResetView.as_view(template_name='users/password_reset.html'), 
          name='password_reset'),

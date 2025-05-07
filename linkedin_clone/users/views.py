@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import login  # Ajoutez cette importation
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -12,8 +13,8 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Créer un profil pour l'utilisateur
-            Profile.objects.create(user=user)
+            # Supprimez cette ligne - le profil est déjà créé par le signal
+            # Profile.objects.create(user=user)
             username = form.cleaned_data.get('username')
             messages.success(request, f'Votre compte a été créé avec succès!')
             # Connecter automatiquement l'utilisateur
