@@ -1,0 +1,36 @@
+/* ... existing styles ... */
+
+.like-article-btn, .like-comment-btn {
+    transition: transform 0.15s ease-out, background-color 0.2s ease, color 0.2s ease;
+    border: 1px solid #ced4da;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.like-article-btn.not-liked,
+.like-comment-btn.not-liked {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.like-article-btn.liked-active,
+.like-comment-btn.liked-active {
+    background-color: #0d6efd; /* Bleu Bootstrap primaire */
+    color: white;
+    border-color: #0d6efd;
+}
+
+.like-article-btn:hover,
+.like-comment-btn:hover {
+    opacity: 0.8;
+}
+
+/* Style pour les commentaires ajoutés dynamiquement (si nécessaire) */
+.comment-card.new-comment-animation {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

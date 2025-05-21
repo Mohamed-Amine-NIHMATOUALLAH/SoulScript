@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Résultats de recherche pour "{{ query }}"</h2>
+                </div>
+                <div class="card-body">
+                    {% if articles %}
+                        <p>{{ articles.count }} résultat(s) trouvé(s)</p>
+                        
+                        {% for article in articles %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    {% if article.image %}
+                                    <div class="col-md-3">
+                                        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-fluid rounded">
+                                    </div>
+                                    <div class="col-md-9">
+                                    {% else %}
+                                    <div class="col-md-12">
+                                    {% endif %}
+                                        <h4 class="card-title">
+                                            <a href="{% url 'article-detail' article.id %}" class="text-decoration-none">{{ article.title }}</a>
+                                        </h4>
+                                        <div class="article-meta mb-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user"></i> <a href="{% url 'user-profile' article.author.username %}" class="text-decoration-none">{{ article.author.get_full_name|default:article.author.username }}</a> | 
+                                                <i class="fas fa-calendar"></i> {{ article.date_posted|date:"d F Y" }} | 
+                                                <i class="fas fa-eye"></i> {{ article.views_count }} vues | 
+                                                <i class="fas fa-heart"></i> {{ article.total_likes }} likes | 
+                                                <i class="fas fa-comment"></i> {{ article.comments.count }} commentaires
+                                            </small>
+                                        </div>
+                                        <div class="article-categories mb-2">
+                                            {% for category in article.categories.all %}
+                                            <a href="{% url 'home' %}?category={{ category.slug }}" class="badge bg-primary text-decoration-none">{{ category.name }}</a>
+                                            {% endfor %}
+                                        </div>
+                                        <p class="card-text">{{ article.content|striptags|truncatewords:30 }}</p>
+                                        <a href="{% url 'article-detail' article.id %}" class="btn btn-sm btn-outline-primary">Lire la suite</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            Aucun résultat trouvé pour "{{ query }}".
+                        </div>
+                        <p>Suggestions:</p>
+                        <ul>
+                            <li>Vérifiez l'orthographe des mots-clés</li>
+                            <li>Essayez des mots-clés différents</li>
+                            <li>Utilisez des mots-clés plus généraux</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Retour à l'accueil
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<br><br>
+<div class="container">
+    <div class="row">
+<!-- Sidebar avec filtres -->
+<div class="col-lg-3">
+    <div class="filter-card card mb-4 sticky-top" style="top: 90px; z-index: 1;">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-filter me-2"></i> Filtres</h4>
+        </div>
+        <div class="card-body p-0">
+            <!-- Catégories -->
+            <div class="filter-group">
+                <div class="filter-group-header">
+                    <h5><i class="fas fa-tags me-2"></i> Catégories</h5>
+                </div>
+                <div class="filter-group-body">
+                    <ul class="filter-list">
+                        <li class="filter-item {% if not active_category %}active{% endif %}">
+                            <a href="{% url 'home' %}" class="filter-link">
+                                Toutes les catégories
+                                <span class="filter-count">{{ articles.count }}</span>
+                            </a>
+                        </li>
+                        {% for category in categories %}
+                        <li class="filter-item {% if active_category == category.slug %}active{% endif %}">
+                            <a href="{% url 'home' %}?category={{ category.slug }}" class="filter-link">
+                                {{ category.name }}
+                                <span class="filter-count">{{ category.article_set.count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Date de publication -->
+            <div class="filter-group">
+                <div class="filter-group-header">
+                    <h5><i class="fas fa-calendar-alt me-2"></i> Date de publication</h5>
+                </div>
+                <div class="filter-group-body">
+                    <ul class="filter-list">
+                        <li class="filter-item {% if not active_date %}active{% endif %}">
+                            <a href="{% url 'home' %}{% if active_category %}?category={{ active_category }}{% endif %}" class="filter-link">
+                                <i class="fas fa-calendar me-2"></i> Toutes les dates
+                            </a>
+                        </li>
+                        <li class="filter-item {% if active_date == 'today' %}active{% endif %}">
+                            <a href="{% url 'home' %}?{% if active_category %}category={{ active_category }}&{% endif %}date=today" class="filter-link">
+                                <i class="fas fa-calendar-day me-2"></i> Aujourd'hui
+                            </a>
+                        </li>
+                        <li class="filter-item {% if active_date == 'week' %}active{% endif %}">
+                            <a href="{% url 'home' %}?{% if active_category %}category={{ active_category }}&{% endif %}date=week" class="filter-link">
+                                <i class="fas fa-calendar-week me-2"></i> Cette semaine
+                            </a>
+                        </li>
+                        <li class="filter-item {% if active_date == 'month' %}active{% endif %}">
+                            <a href="{% url 'home' %}?{% if active_category %}category={{ active_category }}&{% endif %}date=month" class="filter-link">
+                                <i class="fas fa-calendar-alt me-2"></i> Ce mois-ci
+                            </a>
+                        </li>
+                        <li class="filter-item {% if active_date == 'year' %}active{% endif %}">
+                            <a href="{% url 'home' %}?{% if active_category %}category={{ active_category }}&{% endif %}date=year" class="filter-link">
+                                <i class="fas fa-calendar me-2"></i> Cette année
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Liste des articles -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    {% if current_category %}
+                        <i class="fas fa-folder-open me-2"></i> {{ current_category.name }}
+                    {% elif active_date %}
+                        <i class="fas fa-calendar-alt me-2"></i> 
+                        {% if active_date == 'today' %}Articles d'aujourd'hui
+                        {% elif active_date == 'week' %}Articles de cette semaine
+                        {% elif active_date == 'month' %}Articles de ce mois-ci
+                        {% elif active_date == 'year' %}Articles de cette année
+                        {% endif %}
+                    {% else %}
+                        <i class="fas fa-newspaper me-2"></i> Fil d'actualité
+                    {% endif %}
+                </h2>
+                
+                <a href="{% url 'article-create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i> Nouvel article
+                </a>
+            </div>
+            
+            {% if articles %}
+                {% for article in articles %}
+                <div class="card mb-4 article-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex align-items-center mb-3">
+                                    <a href="{% url 'user-profile' article.author.username %}" class="me-3">
+                                        <img src="{{ article.author.profile.image.url }}" alt="{{ article.author.username }}" class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                    </a>
+                                    <div>
+                                        <h5 class="mb-0">
+                                            <a href="{% url 'user-profile' article.author.username %}" class="text-decoration-none">{{ article.author.get_full_name|default:article.author.username }}</a>
+                                        </h5>
+                                        <p class="text-muted mb-0">
+                                            <small>
+                                                <i class="fas fa-calendar-alt me-1"></i> {{ article.date_posted|date:"d F Y à H:i" }}
+                                            </small>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <h3 class="card-title mb-3">
+                                    <a href="{% url 'article-detail' article.id %}" class="text-decoration-none">{{ article.title }}</a>
+                                </h3>
+                                
+                                <div class="article-categories mb-3">
+                                    {% for category in article.categories.all %}
+                                    <a href="{% url 'home' %}?category={{ category.slug }}" class="badge bg-primary text-decoration-none">{{ category.name }}</a>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if article.image %}
+                                <div class="article-image mb-3">
+                                    <!-- Modifier les balises img pour inclure loading="lazy" -->
+                                    <img src="{{ article.image.url }}" alt="{{ article.title }}" class="card-img-top" loading="lazy">
+                                </div>
+                                {% endif %}
+                                
+                                <p class="card-text">{{ article.content|striptags|truncatewords:50 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="article-stats">
+                                        <span class="me-3" title="Vues">
+                                            <i class="fas fa-eye me-1"></i> {{ article.views_count }}
+                                        </span>
+                                        <span class="me-3" title="J'aime">
+                                            <i class="fas fa-heart me-1 {% if user in article.likes.all %}text-danger{% endif %}"></i> 
+                                            <span class="like-count-{{ article.id }}">{{ article.total_likes }}</span>
+                                        </span>
+                                        <span title="Commentaires">
+                                            <i class="fas fa-comment me-1"></i> 
+                                            <span class="comment-count-{{ article.id }}">{{ article.comments.count }}</span>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="article-actions">
+                                        <a href="{% url 'article-detail' article.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="fas fa-book-reader me-1"></i> Lire la suite
+                                        </a>
+                                        
+                                        {% if user.is_authenticated %}
+                                        <button class="btn btn-sm btn-outline-danger me-2 like-button" data-id="{{ article.id }}">
+                                            {% if user in article.likes.all %}
+                                            <i class="fas fa-heart"></i>
+                                            {% else %}
+                                            <i class="far fa-heart"></i>
+                                            {% endif %}
+                                            J'aime
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-secondary toggle-comments" data-id="{{ article.id }}">
+                                            <i class="far fa-comment me-1"></i> Commentaires
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Section commentaires (masquée par défaut) -->
+                                <div class="comments-section-{{ article.id }} mt-4" style="display: none;">
+                                    <hr>
+                                    <h5><i class="fas fa-comments me-2"></i> Commentaires</h5>
+                                    
+                                    <div class="comments-list-{{ article.id }} mb-3">
+                                        {% for comment in article.comments.all|slice:":5" %}
+                                        <div class="comment mb-3">
+                                            <div class="d-flex">
+                                                <img src="{{ comment.author.profile.image.url }}" alt="{{ comment.author.username }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+                                                <div>
+                                                    <div class="fw-bold">{{ comment.author.get_full_name|default:comment.author.username }}</div>
+                                                    <div>{{ comment.content }}</div>
+                                                    <small class="text-muted">{{ comment.date_posted|date:"d/m/Y H:i" }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <p class="text-muted">Aucun commentaire pour le moment.</p>
+                                        {% endfor %}
+                                        
+                                        {% if article.comments.count > 5 %}
+                                        <a href="{% url 'article-detail' article.id %}" class="text-decoration-none">
+                                            <i class="fas fa-ellipsis-h me-1"></i> Voir tous les commentaires ({{ article.comments.count }})
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if user.is_authenticated %}
+                                    <form class="comment-form" data-id="{{ article.id }}">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control comment-input" placeholder="Ajouter un commentaire...">
+                                            <button class="btn btn-primary" type="submit">
+                                                <i class="fas fa-paper-plane me-1"></i> Envoyer
+                                            </button>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <p class="text-muted">
+                                        <a href="{% url 'login' %}">Connectez-vous</a> pour ajouter un commentaire.
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if active_category %}&category={{ active_category }}{% endif %}{% if active_date %}&date={{ active_date }}{% endif %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if active_category %}&category={{ active_category }}{% endif %}{% if active_date %}&date={{ active_date }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if active_category %}&category={{ active_category }}{% endif %}{% if active_date %}&date={{ active_date }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if active_category %}&category={{ active_category }}{% endif %}{% if active_date %}&date={{ active_date }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if active_category %}&category={{ active_category }}{% endif %}{% if active_date %}&date={{ active_date }}{% endif %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Aucun article trouvé.
+                    {% if current_category %}
+                    <p class="mb-0 mt-2">Soyez le premier à publier un article dans la catégorie "{{ current_category.name }}".</p>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center py-4">
+                    <img src="{% static 'img/no-data.svg' %}" alt="Aucun article" class="img-fluid mb-4" style="max-height: 200px;">
+                    <h4>Aucun article à afficher</h4>
+                    <p class="text-muted">Commencez à partager votre expertise professionnelle dès maintenant.</p>
+                    <a href="{% url 'article-create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i> Créer un article
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

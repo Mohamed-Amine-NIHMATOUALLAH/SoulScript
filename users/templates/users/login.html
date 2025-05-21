@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<br /><br />
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card auth-card">
+        <div class="card-header text-center">
+          <h2>Connexion</h2>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">{{ form|crispy }}</fieldset>
+            <div class="form-group">
+              <button class="btn btn-primary btn-block" type="submit">
+                Se connecter
+              </button>
+            </div>
+          </form>
+          <div class="border-top pt-3 text-center">
+            <small class="text-muted">
+              <a href="{% url 'password_reset' %}">Mot de passe oublié?</a>
+            </small>
+          </div>
+          <div class="border-top pt-3 text-center">
+            <small class="text-muted">
+              Vous n'avez pas de compte?
+              <a href="{% url 'register' %}">S'inscrire</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

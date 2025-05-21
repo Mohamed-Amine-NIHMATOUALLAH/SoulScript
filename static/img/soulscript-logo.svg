@@ -1,0 +1,10 @@
+<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+  <path d="M20 10 C 10 10, 5 15, 5 20 C 5 25, 10 30, 15 30 C 20 30, 25 25, 25 20 L 35 20 C 35 30, 25 40, 15 40 C 5 40, -5 30, -5 20 C -5 10, 5 0, 15 0 C 25 0, 35 10, 35 20" transform="translate(15, 5)" fill="url(#logoGradient)"/>
+  <text x="60" y="32" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#4f46e5">SoulScript</text>
+</svg>

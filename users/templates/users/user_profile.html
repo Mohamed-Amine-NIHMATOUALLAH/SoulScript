@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} | Profil{% endblock %}
+
+{% block content %}<br><br>
+<div class="container">
+    <!-- En-tête du profil -->
+    <div class="profile-header">
+        <div class="row profile-header-content">
+            <div class="col-md-4 text-center">
+                <div class="profile-image-container">
+                    <img src="{{ profile.image.url }}" alt="{{ profile_user.username }}" class="profile-image">
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1 class="profile-name">{{ profile_user.get_full_name|default:profile_user.username }}</h1>
+                <p class="profile-title">{{ profile.bio|truncatechars:100 }}</p>
+                
+                {% if profile.location %}
+                <p class="profile-location">
+                    <i class="fas fa-map-marker-alt"></i> {{ profile.location }}
+                </p>
+                {% endif %}
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.articles }}</div>
+                        <div class="stat-label">Articles</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.views }}</div>
+                        <div class="stat-label">Vues</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.likes }}</div>
+                        <div class="stat-label">J'aime</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.comments }}</div>
+                        <div class="stat-label">Commentaires</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Onglets du profil -->
+    <ul class="nav nav-tabs profile-tabs mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+                <i class="fas fa-user me-2"></i> Informations
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="articles-tab" data-bs-toggle="tab" data-bs-target="#articles" type="button" role="tab" aria-controls="articles" aria-selected="false">
+                <i class="fas fa-newspaper me-2"></i> Articles <span class="badge bg-primary rounded-pill">{{ articles.count }}</span>
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Contenu des onglets -->
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Onglet Informations -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-info-circle me-2"></i> Informations personnelles</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h5>Nom d'utilisateur</h5>
+                                    <p>{{ profile_user.username }}</p>
+                                </div>
+                                {% if profile.location %}
+                                <div class="col-md-6">
+                                    <h5>Localisation</h5>
+                                    <p>{{ profile.location }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% if profile.bio %}
+                            <div class="mb-3">
+                                <h5>Biographie</h5>
+                                <p>{{ profile.bio }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    {% if profile.education %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-graduation-cap me-2"></i> Formation</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ profile.education|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile.experience %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-briefcase me-2"></i> Expérience</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ profile.experience|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile.skills %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-tools me-2"></i> Compétences</h4>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ profile.skills|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Onglet Articles -->
+        <div class="tab-pane fade" id="articles" role="tabpanel" aria-labelledby="articles-tab">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-newspaper me-2"></i> Articles de {{ profile_user.get_full_name|default:profile_user.username }}</h3>
+            </div>
+            
+            {% if articles %}
+                <div class="row">
+                    {% for article in articles %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 article-card">
+                            {% if article.image %}
+                            <div class="article-image">
+                                <img src="{{ article.image.url }}" alt="{{ article.title }}" class="card-img-top">
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="article-categories">
+                                        {% for category in article.categories.all %}
+                                        <span class="badge bg-primary">{{ category.name }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">{{ article.date_posted|date:"d/m/Y" }}</small>
+                                </div>
+                                <h5 class="card-title">{{ article.title }}</h5>
+                                <p class="card-text">{{ article.content|striptags|truncatewords:30 }}</p>
+                                <div class="article-stats">
+                                    <span class="me-3" title="Vues">
+                                        <i class="fas fa-eye me-1"></i> {{ article.views_count }}
+                                    </span>
+                                    <span class="me-3" title="J'aime">
+                                        <i class="fas fa-heart me-1"></i> {{ article.total_likes }}
+                                    </span>
+                                    <span title="Commentaires">
+                                        <i class="fas fa-comment me-1"></i> {{ article.comments.count }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{% url 'article-detail' article.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-book-reader me-1"></i> Lire l'article
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <img src="{% static 'img/no-articles.svg' %}" alt="Aucun article" class="img-fluid mb-3" style="max-height: 200px;">
+                    <h4>Aucun article publié</h4>
+                    <p class="text-muted">{{ profile_user.get_full_name|default:profile_user.username }} n'a pas encore publié d'articles.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

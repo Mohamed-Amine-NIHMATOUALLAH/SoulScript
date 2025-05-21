@@ -1,0 +1,934 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .article-header {
+        position: relative;
+        background-color: #f8f9fa;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+    
+    .article-header-with-image {
+        min-height: 300px;
+        display: flex;
+        align-items: flex-end;
+        color: white;
+    }
+    
+    .article-header-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+    }
+    
+    .article-header-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.7));
+        z-index: 1;
+    }
+    
+    .article-header-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .article-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
+        margin: 1.5rem 0;
+    }
+    
+    .article-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+    
+    .author-card {
+        transition: var(--transition);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: none;
+    }
+    
+    .author-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .comment-form textarea {
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        resize: none;
+    }
+    
+    .comment-form button {
+        border-radius: var(--radius-md);
+    }
+    
+    .comment-card {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: none;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+    
+    .comment-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    
+    .comment-reply-form {
+        margin-top: 1rem;
+        margin-left: 3.5rem;
+        display: none;
+    }
+    
+    .comment-reply-form.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .comment-replies {
+        margin-top: 1rem;
+        margin-left: 3.5rem;
+    }
+    
+    .article-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .action-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    .action-button i {
+        margin-right: 0.5rem;
+    }
+    
+    .action-button.like-button {
+        background-color: white;
+        color: #e11d48;
+        border: 1px solid #e11d48;
+    }
+    
+    .action-button.like-button.active,
+    .action-button.like-button:hover {
+        background-color: #e11d48;
+        color: white;
+    }
+    
+    .action-button.comment-button {
+        background-color: white;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+    }
+    
+    .action-button.comment-button:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .action-button.share-button {
+        background-color: white;
+        color: var(--success-color);
+        border: 1px solid var(--success-color);
+    }
+    
+    .action-button.share-button:hover {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .action-button.bookmark-button {
+        background-color: white;
+        color: var(--warning-color);
+        border: 1px solid var(--warning-color);
+    }
+    
+    .action-button.bookmark-button:hover {
+        background-color: var(--warning-color);
+        color: white;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}<br><br>
+<div class="container">
+    <!-- En-tête de l'article -->
+    <div class="article-header {% if article.image %}article-header-with-image{% endif %}">
+        {% if article.image %}
+        <img src="{{ article.image.url }}" alt="{{ article.title }}" class="article-header-image">
+        <div class="article-header-overlay"></div>
+        {% endif %}
+        <div class="container article-header-content">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="d-flex align-items-center mb-3">
+                        {% for category in article.categories.all %}
+                        <a href="{% url 'home' %}?category={{ category.slug }}" class="badge bg-primary me-2 text-decoration-none">{{ category.name }}</a>
+                        {% endfor %}
+                        <span class="text-muted ms-auto {% if article.image %}text-white{% endif %}">
+                            <i class="fas fa-calendar-alt me-1"></i> {{ article.date_posted|date:"d F Y" }}
+                        </span>
+                    </div>
+                    <h1 class="display-4 fw-bold mb-3">{{ article.title }}</h1>
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'user-profile' article.author.username %}" class="d-flex align-items-center text-decoration-none">
+                            <img src="{{ article.author.profile.image.url }}" alt="{{ article.author.username }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+                            <span class="fw-bold {% if article.image %}text-white{% endif %}">{{ article.author.get_full_name|default:article.author.username }}</span>
+                        </a>
+                        <div class="ms-auto">
+                            <span class="me-3 {% if article.image %}text-white{% endif %}" title="Vues">
+                                <i class="fas fa-eye me-1"></i> {{ article.views_count }}
+                            </span>
+                            <span class="me-3 {% if article.image %}text-white{% endif %}" title="J'aime">
+                                <i class="fas fa-heart me-1 {% if user in article.likes.all %}text-danger{% endif %}"></i> 
+                                <span class="like-count">{{ article.total_likes }}</span>
+                            </span>
+                            <span title="Commentaires" class="{% if article.image %}text-white{% endif %}">
+                                <i class="fas fa-comment me-1"></i> 
+                                <span class="comment-count">{{ article.comments.count }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Contenu principal -->
+        <div class="col-lg-8">
+            <div class="card mb-4" style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); border: none;">
+                <div class="card-body p-md-5">
+                    <div class="article-content">
+                        {{ article.content|safe }}
+                    </div>
+                    
+                    <hr class="my-5">
+                    
+                    <!-- Tags -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-tags me-2"></i> Tags</h5>
+                        <div>
+                            {% for category in article.categories.all %}
+                            <a href="{% url 'home' %}?category={{ category.slug }}" class="badge bg-light text-dark me-2 p-2">
+                                <i class="fas fa-tag me-1"></i> {{ category.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Actions de l'article -->
+                    <div class="article-actions">
+                        <button class="action-button like-button {% if user in article.likes.all %}active{% endif %}" data-id="{{ article.id }}">
+                            {% if user in article.likes.all %}
+                            <i class="fas fa-heart"></i>
+                            {% else %}
+                            <i class="far fa-heart"></i>
+                            {% endif %}
+                            J'aime ({{ article.total_likes }})
+                        </button>
+                        
+                        <a href="#comments" class="action-button comment-button">
+                            <i class="far fa-comment"></i> Commenter
+                        </a>
+                        
+                        <!-- Remplacer le bouton de partage par ces options -->
+                        <div class="dropdown">
+                            <button class="action-button share-button" data-bs-toggle="dropdown">
+                                <i class="fas fa-share-alt"></i> Partager
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
+                                        <i class="fab fa-facebook me-2 text-primary"></i> Facebook
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ article.title }}" target="_blank">
+                                        <i class="fab fa-twitter me-2 text-info"></i> Twitter
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ article.title }}" target="_blank">
+                                        <i class="fab fa-linkedin me-2 text-primary"></i> LinkedIn
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="mailto:?subject={{ article.title }}&body={{ request.build_absolute_uri }}">
+                                        <i class="fas fa-envelope me-2 text-danger"></i> Email
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button class="dropdown-item copy-link" data-url="{{ request.build_absolute_uri }}">
+                                        <i class="fas fa-link me-2 text-success"></i> Copier le lien
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Ajouter ce script pour la fonctionnalité de copie de lien -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const copyLinkBtn = document.querySelector('.copy-link');
+                                if (copyLinkBtn) {
+                                    copyLinkBtn.addEventListener('click', function() {
+                                        const url = this.dataset.url;
+                                        navigator.clipboard.writeText(url).then(function() {
+                                            // Afficher une notification de succès
+                                            const toast = document.createElement('div');
+                                            toast.className = 'position-fixed bottom-0 end-0 p-3';
+                                            toast.style.zIndex = '5';
+                                            toast.innerHTML = `
+                                                <div class="toast show" role="alert">
+                                                    <div class="toast-header">
+                                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                                        <strong class="me-auto">Succès</strong>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                                                    </div>
+                                                    <div class="toast-body">Lien copié dans le presse-papiers!</div>
+                                                </div>
+                                            `;
+                                            document.body.appendChild(toast);
+                                            
+                                            // Supprimer la notification après 3 secondes
+                                            setTimeout(() => {
+                                                toast.remove();
+                                            }, 3000);
+                                        });
+                                    });
+                                }
+                            });
+                        </script>
+                        
+                        <!-- Le bouton Sauvegarder a été supprimé -->
+                    </div>
+                    
+                    <!-- Auteur -->
+                    <div class="author-card card mb-5">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 text-center">
+                                    <img src="{{ article.author.profile.image.url }}" alt="{{ article.author.username }}" class="author-image mb-2">
+                                </div>
+                                <div class="col-md-10">
+                                    <h5 class="mb-1">
+                                        <a href="{% url 'user-profile' article.author.username %}" class="text-decoration-none">
+                                            {{ article.author.get_full_name|default:article.author.username }}</span>
+                                        </a>
+                                    </h5>
+                                    <p class="text-muted mb-2">
+                                        {% if article.author.profile.location %}
+                                        <i class="fas fa-map-marker-alt me-1"></i> {{ article.author.profile.location }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-2">{{ article.author.profile.bio|truncatewords:30 }}</p>
+                                    <a href="{% url 'user-profile' article.author.username %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-user me-1"></i> Voir le profil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Commentaires -->
+                    <div id="comments" class="comments-section">
+                        <h3 class="mb-4"><i class="fas fa-comments me-2"></i> Commentaires ({{ article.comments.count }})</h3>
+                        
+                        {% if user.is_authenticated %}
+                        <div class="card mb-4 comment-form-card" style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); border: none;">
+                            <div class="card-body p-4">
+                                <form class="comment-form" data-id="{{ article.id }}">
+                                    <div class="mb-3">
+                                        <label for="commentContent" class="form-label">Ajouter un commentaire</label>
+                                        <textarea class="form-control comment-input" id="commentContent" rows="3" placeholder="Partagez votre avis..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-1"></i> Publier
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i> Veuillez <a href="{% url 'login' %}">vous connecter</a> pour laisser un commentaire.
+                        </div>
+                        {% endif %}
+                        
+                        <div class="comments-list">
+                            {% for comment in article.comments.all %}
+                            <div class="comment-card card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex">
+                                        <img src="{{ comment.author.profile.image.url }}" alt="{{ comment.author.username }}" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h5 class="mb-0">
+                                                    <a href="{% url 'user-profile' comment.author.username %}" class="text-decoration-none">
+                                                        {{ comment.author.get_full_name|default:comment.author.username }}</span>
+                                                    </a>
+                                                </h5>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i> {{ comment.date_posted|date:"d F Y à H:i" }}
+                                                </small>
+                                            </div>
+                                            <p class="mb-2">{{ comment.content }}</p>
+                                            <div class="d-flex align-items-center mt-2">
+                                                <button class="btn btn-sm btn-link text-muted p-0 me-3 like-comment-btn" data-comment-id="{{ comment.id }}">
+                                                    <i class="far fa-thumbs-up me-1"></i> J'aime (<span class="comment-like-count-{{ comment.id }}">{{ comment.comment_likes.count }}</span>)
+                                                </button>
+                                                {% if user.is_authenticated %}
+                                                <button class="btn btn-sm btn-link text-muted p-0 me-3 reply-btn" data-comment-id="{{ comment.id }}">
+                                                    <i class="far fa-comment me-1"></i> Répondre
+                                                </button>
+                                                {% endif %}
+                                                {% if user == comment.author %}
+                                                <button class="btn btn-sm btn-link text-danger p-0 delete-comment-btn" data-comment-id="{{ comment.id }}">
+                                                    <i class="far fa-trash-alt me-1"></i> Supprimer
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Formulaire de réponse -->
+                                            {% if user.is_authenticated %}
+                                            <div class="comment-reply-form" id="replyForm-{{ comment.id }}">
+                                                <form class="reply-form" data-comment-id="{{ comment.id }}">
+                                                    <div class="mb-2">
+                                                        <textarea class="form-control reply-input" rows="2" placeholder="Écrivez votre réponse..."></textarea>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end">
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-reply-btn" data-comment-id="{{ comment.id }}">
+                                                            Annuler
+                                                        </button>
+                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-reply me-1"></i> Répondre
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <!-- Réponses aux commentaires -->
+                                            <div class="comment-replies" id="replies-{{ comment.id }}">
+                                                <!-- Les réponses seront ajoutées ici par JavaScript -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-4">
+                                <img src="{% static 'img/no-comments.svg' %}" alt="Aucun commentaire" class="img-fluid mb-3" style="max-height: 150px;">
+                                <h5>Aucun commentaire pour le moment</h5>
+                                <p class="text-muted">Soyez le premier à commenter cet article.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="article-sidebar">
+                <!-- Articles similaires -->
+                <div class="card mb-4" style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); border: none;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i> Articles similaires</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% for related_article in related_articles %}
+                        <div class="p-3">
+                            <h6 class="mb-1">
+                                <a href="{% url 'article-detail' related_article.id %}" class="text-decoration-none">{{ related_article.title }}</a>
+                            </h6>
+                            <p class="text-muted mb-2">
+                                <small>
+                                    <i class="fas fa-calendar-alt me-1"></i> {{ related_article.date_posted|date:"d/m/Y" }}
+                                </small>
+                            </p>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ related_article.author.profile.image.url }}" alt="{{ related_article.author.username }}" class="rounded-circle me-2" width="25" height="25" style="object-fit: cover;">
+                                <small>{{ related_article.author.get_full_name|default:related_article.author.username }}</small>
+                            </div>
+                        </div>
+                        <hr class="m-0">
+                        {% empty %}
+                        <div class="p-3 text-center">
+                            <p class="text-muted mb-0">Aucun article similaire trouvé.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Catégories populaires -->
+                <div class="card mb-4" style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); border: none;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-tags me-2"></i> Catégories populaires</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            {% for category in categories %}
+                            <div class="col-6">
+                                <a href="{% url 'home' %}?category={{ category.slug }}" class="btn btn-outline-primary w-100 text-start">
+                                    <i class="fas fa-tag me-1"></i> {{ category.name }}
+                                    <span class="badge bg-primary float-end">{{ category.article_set.count }}</span>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de partage -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel"><i class="fas fa-share-alt me-2"></i> Partager l'article</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center mb-4">Partagez cet article sur vos réseaux sociaux</p>
+                <div class="d-flex justify-content-center mb-4">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-primary mx-2" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-facebook-f fa-lg"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ article.title }}" target="_blank" class="btn btn-outline-info mx-2" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ article.title }}" target="_blank" class="btn btn-outline-secondary mx-2" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fab fa-linkedin-in fa-lg"></i>
+                    </a>
+                    <a href="mailto:?subject={{ article.title }}&body={{ request.build_absolute_uri }}" class="btn btn-outline-danger mx-2" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-envelope fa-lg"></i>
+                    </a>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="shareLink" value="{{ request.build_absolute_uri }}" readonly>
+                    <button class="btn btn-primary" type="button" id="copyLinkBtn">
+                        <i class="fas fa-copy me-1"></i> Copier
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion des likes
+        const likeButton = document.querySelector('.like-button');
+        const likeCount = document.querySelectorAll('.like-count');
+        
+        if (likeButton) {
+            likeButton.addEventListener('click', function() {
+                const articleId = this.dataset.id;
+                
+                fetch(`/like/${articleId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    likeCount.forEach(el => {
+                        el.textContent = data.total_likes;
+                    });
+                    
+                    if (data.liked) {
+                        likeButton.classList.add('active');
+                        likeButton.innerHTML = '<i class="fas fa-heart"></i> J\'aime (' + data.total_likes + ')';
+                    } else {
+                        likeButton.classList.remove('active');
+                        likeButton.innerHTML = '<i class="far fa-heart"></i> J\'aime (' + data.total_likes + ')';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Gestion des commentaires
+        const commentForm = document.querySelector('.comment-form');
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const articleId = this.dataset.id;
+                const commentInput = this.querySelector('.comment-input');
+                const commentsList = document.querySelector('.comments-list');
+                
+                if (commentInput.value.trim() === '') return;
+                
+                fetch(`/comment/${articleId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: commentInput.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mettre à jour le compteur de commentaires
+                        document.querySelectorAll('.comment-count').forEach(el => {
+                            el.textContent = data.total_comments;
+                        });
+                        
+                        // Si aucun commentaire, supprimer le message "Aucun commentaire"
+                        if (commentsList.querySelector('.text-center')) {
+                            commentsList.innerHTML = '';
+                        }
+                        
+                        // Ajouter le nouveau commentaire
+                        const newComment = document.createElement('div');
+                        newComment.className = 'comment-card card fade-in';
+                        newComment.innerHTML = `
+                            <div class="card-body p-4">
+                                <div class="d-flex">
+                                    <img src="${data.author_image}" alt="${data.author}" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="mb-0">
+                                                <a href="/profile/${data.author_username}/" class="text-decoration-none">
+                                                    ${data.author}
+                                                </a>
+                                            </h5>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i> À l'instant
+                                            </small>
+                                        </div>
+                                        <p class="mb-2">${data.content}</p>
+                                        <div class="d-flex align-items-center mt-2">
+                                            <button class="btn btn-sm btn-link text-muted p-0 me-3 like-comment-btn" data-comment-id="{{ comment.id }}">
+                                                <i class="far fa-thumbs-up me-1"></i> J'aime
+                                            </button>
+                                            <button class="btn btn-sm btn-link text-muted p-0 me-3 reply-btn" data-comment-id="{{ data.comment_id }}">
+                                                <i class="far fa-comment me-1"></i> Répondre
+                                            </button>
+                                            <button class="btn btn-sm btn-link text-danger p-0 delete-comment-btn" data-comment-id="{{ data.comment_id }}">
+                                                <i class="far fa-trash-alt me-1"></i> Supprimer
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="comment-reply-form" id="replyForm-${data.comment_id}">
+                                            <form class="reply-form" data-comment-id="${data.comment_id}">
+                                                <div class="mb-2">
+                                                    <textarea class="form-control reply-input" rows="2" placeholder="Écrivez votre réponse..."></textarea>
+                                                </div>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary me-2 cancel-reply-btn" data-comment-id="${data.comment_id}">
+                                                        Annuler
+                                                    </button>
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-reply me-1"></i> Répondre
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        
+                                        <div class="comment-replies" id="replies-${data.comment_id}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        commentsList.prepend(newComment);
+                        
+                        // Réinitialiser le formulaire
+                        commentInput.value = '';
+                        
+                        // Ajouter les événements pour le nouveau commentaire
+                        addCommentEvents(newComment);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
+        
+        // Gestion des réponses aux commentaires
+        function addCommentEvents(commentElement) {
+            // Bouton de réponse
+            const replyBtns = commentElement ? commentElement.querySelectorAll('.reply-btn') : document.querySelectorAll('.reply-btn');
+            replyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const commentId = this.dataset.commentId;
+                    const replyForm = document.getElementById(`replyForm-${commentId}`);
+                    
+                    // Fermer tous les autres formulaires de réponse
+                    document.querySelectorAll('.comment-reply-form.active').forEach(form => {
+                        if (form.id !== `replyForm-${commentId}`) {
+                            form.classList.remove('active');
+                        }
+                    });
+                    
+                    // Ouvrir/fermer le formulaire de réponse
+                    replyForm.classList.toggle('active');
+                    
+                    if (replyForm.classList.contains('active')) {
+                        replyForm.querySelector('textarea').focus();
+                    }
+                });
+            });
+            
+            // Bouton d'annulation de réponse
+            const cancelReplyBtns = commentElement ? commentElement.querySelectorAll('.cancel-reply-btn') : document.querySelectorAll('.cancel-reply-btn');
+            cancelReplyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const commentId = this.dataset.commentId;
+                    const replyForm = document.getElementById(`replyForm-${commentId}`);
+                    replyForm.classList.remove('active');
+                });
+            });
+            
+            // Formulaire de réponse
+            const replyForms = commentElement ? commentElement.querySelectorAll('.reply-form') : document.querySelectorAll('.reply-form');
+            replyForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const commentId = this.dataset.commentId;
+                    const replyInput = this.querySelector('.reply-input');
+                    const repliesList = document.getElementById(`replies-${commentId}`);
+                    
+                    if (replyInput.value.trim() === '') return;
+                    
+                    fetch(`/reply/${commentId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            content: replyInput.value
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Ajouter la nouvelle réponse
+                            const newReply = document.createElement('div');
+                            newReply.className = 'comment-reply fade-in';
+                            newReply.innerHTML = `
+                                <div class="d-flex mt-3">
+                                    <img src="${data.author_image}" alt="${data.author}" class="rounded-circle me-2" width="35" height="35" style="object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="mb-0">
+                                                <a href="/profile/${data.author_username}/" class="text-decoration-none">
+                                                    ${data.author}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i> À l'instant
+                                            </small>
+                                        </div>
+                                        <p class="mb-1">${data.content}</p>
+                                        <div class="d-flex align-items-center mt-1">
+                                            <button class="btn btn-sm btn-link text-muted p-0 me-3">
+                                                <i class="far fa-thumbs-up me-1"></i> J'aime
+                                            </button>
+                                            {% if user == comment.author %}
+                                            <button class="btn btn-sm btn-link text-danger p-0">
+                                                <i class="far fa-trash-alt me-1"></i> Supprimer
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            repliesList.appendChild(newReply);
+                            
+                            // Réinitialiser le formulaire et le fermer
+                            replyInput.value = '';
+                            document.getElementById(`replyForm-${commentId}`).classList.remove('active');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+            
+            // Bouton de suppression de commentaire
+            const deleteCommentBtns = commentElement ? commentElement.querySelectorAll('.delete-comment-btn') : document.querySelectorAll('.delete-comment-btn');
+            deleteCommentBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+                        const commentId = this.dataset.commentId;
+                        
+                        fetch(`/delete-comment/${commentId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken'),
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Supprimer le commentaire du DOM
+                                const commentCard = this.closest('.comment-card');
+                                commentCard.style.opacity = '0';
+                                setTimeout(() => {
+                                    commentCard.remove();
+                                    
+                                    // Mettre à jour le compteur de commentaires
+                                    document.querySelectorAll('.comment-count').forEach(el => {
+                                        el.textContent = data.total_comments;
+                                    });
+                                    
+                                    // Si plus de commentaires, afficher le message "Aucun commentaire"
+                                    if (data.total_comments === 0) {
+                                        const commentsList = document.querySelector('.comments-list');
+                                        commentsList.innerHTML = `
+                                            <div class="text-center py-4">
+                                                <img src="/static/img/no-comments.svg" alt="Aucun commentaire" class="img-fluid mb-3" style="max-height: 150px;">
+                                                <h5>Aucun commentaire pour le moment</h5>
+                                                <p class="text-muted">Soyez le premier à commenter cet article.</p>
+                                            </div>
+                                        `;
+                                    }
+                                }, 300);
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+            });
+        }
+        
+        // Initialiser les événements pour les commentaires existants
+        addCommentEvents();
+        
+        // Copier le lien de partage
+        const copyLinkBtn = document.getElementById('copyLinkBtn');
+        const shareLink = document.getElementById('shareLink');
+        
+        if (copyLinkBtn && shareLink) {
+            copyLinkBtn.addEventListener('click', function() {
+                shareLink.select();
+                document.execCommand('copy');
+                
+                const originalText = copyLinkBtn.innerHTML;
+                copyLinkBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copié!';
+                copyLinkBtn.classList.remove('btn-primary');
+                copyLinkBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyLinkBtn.innerHTML = originalText;
+                    copyLinkBtn.classList.remove('btn-success');
+                    copyLinkBtn.classList.add('btn-primary');
+                }, 2000);
+            });
+        }
+        
+        // Fonction pour obtenir le cookie CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Gestion des likes de commentaires
+        document.querySelectorAll('.like-comment-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.dataset.commentId;
+                fetch(`/like-comment/${commentId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const likeCountSpan = document.querySelector(`.comment-like-count-${commentId}`);
+                        likeCountSpan.textContent = data.total_likes;
+                        const icon = this.querySelector('i');
+                        if (data.liked) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            this.classList.add('text-primary'); // Ou une autre classe pour indiquer que c'est liké
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            this.classList.remove('text-primary');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error liking comment:', error));
+            });
+        });
+    })
+        </script>
+        {% endblock %}

@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{{ user.get_full_name|default:user.username }} | Profil{% endblock %}
+
+{% block content %}
+<br><br>
+<div class="container">
+    <!-- En-tête du profil -->
+    <div class="profile-header">
+        <div class="row profile-header-content">
+            <div class="col-md-4 text-center">
+                <div class="profile-image-container">
+                    <img src="{{ user.profile.image.url }}" alt="{{ user.username }}" class="profile-image">
+                    <label for="id_image" class="profile-image-edit" title="Modifier la photo de profil">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="profile-title">{{ user.profile.bio|truncatechars:100 }}</p>
+                
+                {% if user.profile.location %}
+                <p class="profile-location">
+                    <i class="fas fa-map-marker-alt"></i> {{ user.profile.location }}
+                </p>
+                {% endif %}
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.articles }}</div>
+                        <div class="stat-label">Articles</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.views }}</div>
+                        <div class="stat-label">Vues</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.likes }}</div>
+                        <div class="stat-label">J'aime</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ stats.comments }}</div>
+                        <div class="stat-label">Commentaires</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Onglets du profil -->
+    <ul class="nav nav-tabs profile-tabs mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">
+                <i class="fas fa-user me-2"></i> Informations
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="articles-tab" data-bs-toggle="tab" data-bs-target="#articles" type="button" role="tab" aria-controls="articles" aria-selected="false">
+                <i class="fas fa-newspaper me-2"></i> Articles <span class="badge bg-primary rounded-pill">{{ articles.count }}</span>
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Contenu des onglets -->
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Onglet Informations -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <div class="row">
+                <div class="col-md-8">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Informations personnelles -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4><i class="fas fa-info-circle me-2"></i> Informations personnelles</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ u_form.username|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ u_form.email|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ u_form.first_name|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ u_form.last_name|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    {{ p_form.image|as_crispy_field }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ p_form.bio|as_crispy_field }}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ p_form.location|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ p_form.birth_date|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Formation -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4><i class="fas fa-graduation-cap me-2"></i> Formation</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ p_form.education|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Expérience -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4><i class="fas fa-briefcase me-2"></i> Expérience</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ p_form.experience|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Compétences -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4><i class="fas fa-tools me-2"></i> Compétences</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    {{ p_form.skills|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bouton de soumission unique -->
+                        <div class="text-center mb-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i> Enregistrer toutes les modifications
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Statistiques ou autres informations -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-bar me-2"></i> Statistiques</h4>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Membre depuis :</strong> {{ user.date_joined|date:"d F Y" }}</p>
+                            <p><strong>Dernière connexion :</strong> {{ user.last_login|date:"d F Y à H:i" }}</p>
+                            <hr>
+                            <p><strong>Articles publiés :</strong> {{ stats.articles }}</p>
+                            <p><strong>Vues totales :</strong> {{ stats.views }}</p>
+                            <p><strong>J'aime reçus :</strong> {{ stats.likes }}</p>
+                            <p><strong>Commentaires reçus :</strong> {{ stats.comments }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Onglet Articles -->
+        <div class="tab-pane fade" id="articles" role="tabpanel" aria-labelledby="articles-tab">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-newspaper me-2"></i> Mes articles</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if articles %}
+                                {% for article in articles %}
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <a href="{% url 'article-detail' article.pk %}">{{ article.title }}</a>
+                                            </h5>
+                                            <p class="card-text">{{ article.content|truncatechars_html:200|safe }}</p>
+                                            <p class="card-text">
+                                                <small class="text-muted">
+                                                    Publié le {{ article.date_posted|date:"d F Y" }}
+                                                    {% if article.is_draft %}
+                                                        <span class="badge bg-warning text-dark">Brouillon</span>
+                                                    {% endif %}
+                                                </small>
+                                            </p>
+                                            <p class="card-text">
+                                                <small>
+                                                    <i class="fas fa-eye"></i> {{ article.views_count }} vues
+                                                    <i class="fas fa-heart"></i> {{ article.total_likes }} j'aime
+                                                    <i class="fas fa-comment"></i> {{ article.total_comments }} commentaires
+                                                </small>
+                                            </p>
+                                            <a href="{% url 'article-update' article.pk %}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                                            <a href="{% url 'article-delete' article.pk %}" class="btn btn-sm btn-outline-danger">Supprimer</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">Vous n'avez publié aucun article pour le moment.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Prévisualisation de l'image de profil
+        const imageInput = document.querySelector('#id_image');
+        const profileImage = document.querySelector('.profile-image');
+        
+        if (imageInput && profileImage) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profileImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
