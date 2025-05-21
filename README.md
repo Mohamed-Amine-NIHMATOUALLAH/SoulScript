@@ -1,8 +1,6 @@
 # SoulScript - Professional Document Sharing Platform
 
-<div align="center">
-   <img src="https://via.placeholder.com/200x200?text=SoulScript" alt="SoulScript Logo" width="200" height="200"/>
-  
+<div align="center">  
   <br>
   <p><strong>A LinkedIn-inspired platform for professionals to share and manage their career documents</strong></p>
   
