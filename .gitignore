@@ -5,36 +5,53 @@
 *.env.test
 *.env.production
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.pyc
-*.pyo
-*.pyd
-.Python
-pip-log.txt
-.coverage
-.tox/
-
-# Django
+# Python/Django
 *.log
+*.pot
+*.pyc
+__pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
 
-# Virtual Environment
-venv/
+# Environment
+.env
+.venv
 env/
+venv/
+ENV/
+*.env.*
 
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+.vs/
 
-# OS specific files
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Testing and Coverage
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+coverage.xml
+*.cover
+
+# Dependency directories
+node_modules/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Project specific
+uploads/
+local_settings.py
